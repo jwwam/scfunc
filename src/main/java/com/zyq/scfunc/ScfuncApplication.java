@@ -1,14 +1,19 @@
 package com.zyq.scfunc;
 
+import com.zyq.scfunc.pojo.Foo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import reactor.core.publisher.Flux;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SpringBootApplication
+@Slf4j
 public class ScfuncApplication {
 
 	public static void main(String[] args) {
@@ -20,7 +25,6 @@ public class ScfuncApplication {
 		return value -> new StringBuilder(value).reverse().toString();
 	}
 
-
 	@Bean
 	public Function<String, String> uppercase() {
 		return value -> value.toUpperCase();
@@ -31,57 +35,17 @@ public class ScfuncApplication {
 		return () -> Flux.fromArray(new Foo[]{new Foo("foo"), new Foo("bar")}).log();
 	}
 
-}
-
-class Foo {
-
-	private String value;
-
-	Foo() {
+	@Bean
+	public Function<Foo, List> word() {
+		return ss -> {
+			log.info("调用word成功，入参: "+ss.toString());
+			return Arrays.asList(ss.getValue().split(","));
+		};
 	}
 
-	public String lowercase() {
-		return value.toLowerCase();
-	}
-
-	public Foo(String value) {
-		this.value = value;
-	}
-
-	public String uppercase() {
-		return value.toUpperCase();
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
-}
-
-class Bar {
-
-	private String value;
-
-	Bar() {
-	}
-
-	public static Bar valueOf(String value) {
-		return new Bar(value);
-	}
-
-	Bar(String value) {
-		this.value = value;
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
+	@Bean
+	public Function<Flux<String>, Flux<String>> lowerCase() {
+		return flux -> flux.map(value -> value.toLowerCase());
 	}
 
 }
